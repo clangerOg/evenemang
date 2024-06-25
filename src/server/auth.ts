@@ -1,3 +1,4 @@
+/*
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import {
   getServerSession,
@@ -5,21 +6,25 @@ import {
   type NextAuthOptions,
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
+import CredentialsProvider from "next-auth/providers/credentials";
+import DiscordProvider from "next-auth/providers/discord";
 
+import { env } from "@/env";
 import { db } from "@/server/db";
+*/
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
  * object and keep type safety.
  *
  * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
- */
+ 
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
       // ...other properties
-      // role: UserRole;
+      role: "ADMIN" | "USER";
     } & DefaultSession["user"];
   }
 
@@ -28,12 +33,13 @@ declare module "next-auth" {
   //   // role: UserRole;
   // }
 }
+  */
 
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
  *
  * @see https://next-auth.js.org/configuration/options
- */
+ 
 export const authOptions: NextAuthOptions = {
   callbacks: {
     session: ({ session, user }) => ({
@@ -44,12 +50,40 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   },
+  pages: {
+    signIn: "/auth/signin",
+    newUser: "/auth/new-user",
+  },
   adapter: PrismaAdapter(db) as Adapter,
   providers: [
-    // DiscordProvider({
-    //   clientId: env.DISCORD_CLIENT_ID,
-    //   clientSecret: env.DISCORD_CLIENT_SECRET,
-    // }),
+    DiscordProvider({
+      clientId: env.DISCORD_CLIENT_ID,
+      clientSecret: env.DISCORD_CLIENT_SECRET,
+    }),
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials) {
+          return null;
+        }
+
+        db.user.findUnique({
+          where: {
+            email: credentials?.email,
+          },
+        });
+
+        return {
+          id: "1",
+          name: "John Doe",
+          email: credentials.email,
+        };
+      },
+    }),
     /**
      * ...add more providers here.
      *
@@ -58,13 +92,15 @@ export const authOptions: NextAuthOptions = {
      * model. Refer to the NextAuth.js docs for the provider you want to use. Example:
      *
      * @see https://next-auth.js.org/providers/github
-     */
+     
   ],
 };
+*/
 
 /**
  * Wrapper for `getServerSession` so that you don't need to import the `authOptions` in every file.
  *
  * @see https://next-auth.js.org/configuration/nextjs
- */
+ 
 export const getServerAuthSession = () => getServerSession(authOptions);
+*/

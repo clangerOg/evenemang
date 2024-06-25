@@ -1,8 +1,14 @@
 import "@/styles/globals.css";
 
-import { GeistSans } from "geist/font/sans";
-
+import { cn } from "@/lib/utils";
 import { TRPCReactProvider } from "@/trpc/react";
+import { Inter } from "next/font/google";
+
+const fontSans = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-sans",
+});
 
 export const metadata = {
   title: "Create T3 App",
@@ -16,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${GeistSans.variable}`}>
+    <html lang="en" className={cn(fontSans.variable)}>
       <body>
         <TRPCReactProvider>{children}</TRPCReactProvider>
       </body>
